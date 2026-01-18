@@ -3,10 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AMK.Views.OurNewsPage"
              Title="OurNewsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="OurNews"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid x:Name="Place">
+        <Grid.RowDefinitions>
+            <!--реализация CRUD-->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        
+    </Grid>
 </ContentPage>

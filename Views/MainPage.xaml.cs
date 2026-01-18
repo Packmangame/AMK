@@ -9,16 +9,14 @@ public partial class MainPage : ContentPage
 {
     NewsViewModel _viewModel;
     RssNewsItems _currentArticle;
+    User _user;
     public MainPage()
     {
         InitializeComponent();
         var newsService = new RssNewsServices();
         _viewModel = new NewsViewModel(newsService);
-
         BindingContext = _viewModel;
-        
         LoadNews();
-
     }
     private async void LoadNews()
     {
@@ -42,18 +40,6 @@ public partial class MainPage : ContentPage
     private void OnLoadMoreClicked(object sender, EventArgs e)
     {
         LoadNews();
-    }
-
-    
-    private async void MenuButton_Clicked(object sender, EventArgs e)
-    {
-    }
-
-
-   
-
-    private void ProfileButton_Clicked(object sender, EventArgs e)
-    {
     }
 
    

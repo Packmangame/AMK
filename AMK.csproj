@@ -84,6 +84,9 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>Strings.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\EditDatabasePage.xaml.cs">
+	    <DependentUpon>EditDatabasePage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -102,6 +105,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CalendarPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\EditDatabasePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\LoginPage.xaml">

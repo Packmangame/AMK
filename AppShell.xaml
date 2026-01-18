@@ -73,6 +73,11 @@
                   Route="LoginPage"
                   FlyoutItemIsVisible="False"
                   Style="{StaticResource LoginPageStyle}"/>
+    
+    <ShellContent 
+                  ContentTemplate="{DataTemplate pages:EditDatabase}"
+                  Route="EditDatabase"
+                  FlyoutItemIsVisible="False"/>
 
     <ShellContent x:Name="WebPageTab"
                   ContentTemplate="{DataTemplate pages:NewsDetailPage}"

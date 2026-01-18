@@ -29,6 +29,7 @@ namespace AMK
             builder.Services.AddSingleton<AppShell>();
 
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<EditDatabase>();
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<CalendarPage>();
             builder.Services.AddTransient<OurNewsPage>();

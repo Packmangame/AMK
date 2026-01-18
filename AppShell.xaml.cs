@@ -17,11 +17,11 @@ namespace AMK
             //Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
 
 
-            //FlyoutBehavior = FlyoutBehavior.Disabled;
-            //CurrentItem = LoginPageTab;
-
+           // FlyoutBehavior = FlyoutBehavior.Disabled;
             CurrentItem = MainPageTab;
-            
+
+
+
         }
         private void MenuButton_Clicked(object sender, EventArgs e)
         {

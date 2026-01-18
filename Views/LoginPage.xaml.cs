@@ -28,9 +28,13 @@ public partial class LoginPage : ContentPage
             if (!string.IsNullOrEmpty(_login.Text) && !string.IsNullOrEmpty(_password.Text))
             {
                 var _user = await _databaseService.AuthenticateAsync(_login.Text, _password.Text);
-                var appShell = (AppShell)Shell.Current;
-                await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
-                appShell.EnableMenu(); 
+                if (_user != null)
+                {
+                    SessionService.Instance.SetCurrentUser(_user);
+                    var appShell = (AppShell)Shell.Current;
+                    await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+                    appShell.EnableMenu();
+                }
             }
             else
             {

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.EditDatabase"
+             Title="EditDatabase">
+
+    <ContentPage.BindingContext>
+        <viewmodels:UsersViewModel />
+    </ContentPage.BindingContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <RefreshView Grid.Row="0" 
+                     IsRefreshing="{Binding IsLoading}"
+                     Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Users}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="16,8" 
+                              ColumnDefinitions="*,Auto,Auto"
+                              RowDefinitions="Auto,Auto">
+
+                            <!-- Информация о пользователе -->
+                            <StackLayout Grid.Column="0" Grid.RowSpan="2">
+                                <Label Text="{Binding FIO}" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold"/>
+                                <Label Text="{Binding Login}" 
+                                       TextColor="{StaticResource Gray500}"/>
+                                <Label Text="{Binding RoleDetail.Title, StringFormat='Роль: {0}'}" 
+                                       TextColor="{StaticResource Gray600}"/>
+                                <Label Text="{Binding DepartmentDetail.DepartmentName, StringFormat='Отдел: {0}'}" 
+                                       TextColor="{StaticResource Gray600}"/>
+                            </StackLayout>
+
+                            <!-- Кнопки действий -->
+                            <Button Grid.Column="1" 
+                                    Grid.Row="0"
+                                    Text="✏️"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=EditUserCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Style="{StaticResource SecondaryButton}"/>
+
+                            <Button Grid.Column="2" 
+                                    Grid.Row="0"
+                                    Text="🗑️"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=DeleteUserCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Style="{StaticResource DangerButton}"/>
+
+                            <!-- Контактная информация -->
+                            <StackLayout Grid.Column="1" 
+                                         Grid.ColumnSpan="2"
+                                         Grid.Row="1"
+                                         Spacing="4">
+                                <Label Text="{Binding Email, StringFormat='📧 {0}'}" 
+                                       IsVisible="{Binding Email, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                <Label Text="{Binding Phone, StringFormat='📱 {0}'}" 
+                                       IsVisible="{Binding Phone, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            </StackLayout>
+
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

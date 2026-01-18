@@ -3,10 +3,37 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AMK.Views.ProfilePage"
              Title="ProfilePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <StackLayout Background="Yellow" Grid.Row="1">
+            
+        </StackLayout>
+        
+        <StackLayout Background="Red" Grid.Row="1" Orientation="Vertical" Padding="10">
+            <Image Source="user.png" Aspect="AspectFit" HeightRequest="150" WidthRequest="150" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <StackLayout HeightRequest="40" Orientation="Horizontal" BackgroundColor="Aqua">
+                <Image Source="brush.png"/>
+                <Button Text="Редактировать профиль" Clicked="EditProfile" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </StackLayout>
+        </StackLayout>
+        
+        <StackLayout Background="Blue" Grid.Row="2" Padding="20">
+            <Frame BackgroundColor="Azure" VerticalOptions="FillAndExpand" Padding="5">
+                
+                
+                
+                
+                <!--последняя кнопка-->
+                <StackLayout Orientation="Horizontal">
+                    <Image Source="#"/>
+                    <Button Text="Редактировать БД" Clicked="EditBd"/>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </Grid>
 </ContentPage>

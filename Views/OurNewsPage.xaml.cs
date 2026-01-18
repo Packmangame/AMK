@@ -1,9 +1,15 @@
+using AMK.Services;
+
 namespace AMK.Views;
 
 public partial class OurNewsPage : ContentPage
 {
-	public OurNewsPage()
+	Models.Users.User _user;
+
+    public OurNewsPage()
 	{
 		InitializeComponent();
+		_user = SessionService.Instance.CurrentUser;
+		
 	}
 }
