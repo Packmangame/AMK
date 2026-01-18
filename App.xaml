@@ -1,0 +1,34 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:AMK"
+             x:Class="AMK.App">
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <x:String x:Key="_login">Login</x:String>
+            <x:String x:Key="_password">Password</x:String>
+            <x:String x:Key="_enter">Enter</x:String>
+            <x:String x:Key="_language">Language</x:String>
+            <x:String x:Key="_rus">Russian</x:String>
+            <x:String x:Key="_eng">English</x:String>
+            <x:String x:Key="_welcome">Welcome to AMK app!</x:String>
+            <x:String x:Key="_profile">Profile</x:String>
+            <x:String x:Key="_calendar">Calendar</x:String>
+            <x:String x:Key="_news">News</x:String>
+            <x:String x:Key="_lerning">Education</x:String>
+            <x:String x:Key="_amkNews">Our news</x:String>
+            <x:String x:Key="_settings">Settings</x:String>
+            <x:String x:Key="_amk">AMK</x:String>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+
+<!--https://www.kolesa.ru/export/rss.xml - Kolesa-->
+<!--https://auto.mail.ru/rss/ - Mail-->
+<!--https://motor.ru/exports/rss.xml - Motor-->

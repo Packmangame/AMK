@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.LoginPage">
+
+    <VerticalStackLayout>
+        <Label Text="{DynamicResource _welcome}"/>
+       
+        <Editor Placeholder="{DynamicResource _login}" x:Name="_login"/>
+        <Editor Placeholder="{DynamicResource _password}" x:Name="_password"/>
+        
+        <Button Text="{DynamicResource _enter}" Clicked="EnterButton_Clicked"/>
+        <Button Text="Создать пользователя" Clicked="CreatePolButton_Clicked"/>
+        <Button Text="Создать администратора" Clicked="CreateAdminButton_Clicked"/>
+    </VerticalStackLayout>
+</ContentPage>
