@@ -6,39 +6,79 @@
     xmlns:local="clr-namespace:AMK"
     xmlns:pages="clr-namespace:AMK.Views"
     Title="AMK"
-    Shell.TabBarIsVisible="False">
+    Shell.TabBarIsVisible="False" BackgroundColor="ForestGreen">
 
+    <Shell.Resources>
+        <Style x:Key="LoginPageStyle" TargetType="NavigationPage">
+            <Setter Property="Shell.NavBarIsVisible" Value="False"/>
+        </Style>
+    </Shell.Resources>
+    
+    <Shell.TitleView>
+        <Grid Padding="10" HorizontalOptions="Fill" HeightRequest="60">
+            <Grid.ColumnDefinitions>
 
-    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems" IsVisible="False">
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <Image Source="amklogo.png" 
+            Grid.Column="0"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"/>
+
+            <ImageButton Source="user.png" 
+                  Grid.Column="1" 
+                  Padding="10"
+                  BackgroundColor="Transparent"
+                  Clicked="ProfileButton_Clicked"/>
+        </Grid>
+    </Shell.TitleView>
+    
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems" IsVisible="True" >
 
         <Tab  Title="Новости"
-           Icon="news.png" >
+           Icon="news.png">
             
             <ShellContent Title="Авто новости" 
                           Icon="sedan.png"
                           x:Name="MainPageTab"
+                          Route="MainPage"
              ContentTemplate="{DataTemplate pages:MainPage}"/>
 
             <ShellContent Title="Наши новости" 
                           Icon="home.png"
+                          
              ContentTemplate="{DataTemplate pages:OurNewsPage}"/>
         </Tab>
-        <Tab Title="Календарь"
-         Icon="calendar.png">
-            <ShellContent 
-         ContentTemplate="{DataTemplate pages:CalendarPage}"/>
-        </Tab>
+
+        <ShellContent  Title="Календарь"
+                       Icon="calendar.png"
+            ContentTemplate="{DataTemplate pages:CalendarPage}"/>
+       
+        
+            <ShellContent Route="ProfilePage"
+                          Title="Профиль"
+                          Icon="user.png"
+                 ContentTemplate="{DataTemplate pages:ProfilePage}"/>
+       
     </FlyoutItem>
 
     <ShellContent x:Name="LoginPageTab"
                   ContentTemplate="{DataTemplate pages:LoginPage}"
                   Route="LoginPage"
-                  FlyoutItemIsVisible="False"/>
+                  FlyoutItemIsVisible="False"
+                  Style="{StaticResource LoginPageStyle}"/>
 
     <ShellContent x:Name="WebPageTab"
                   ContentTemplate="{DataTemplate pages:NewsDetailPage}"
                   Route="NewsDetailPage"
                   FlyoutItemIsVisible="False"/>
+    
 
 </Shell>
 

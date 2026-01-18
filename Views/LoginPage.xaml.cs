@@ -1,6 +1,9 @@
 using AMK.Models.Users;
 using AMK.Services;
+using CommunityToolkit.Maui.Alerts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.IdentityModel.Tokens;
 using SQLite;
 using System.Threading.Tasks;
 
@@ -20,11 +23,24 @@ public partial class LoginPage : ContentPage
    
     private async void EnterButton_Clicked(object sender, EventArgs e)
     {
-        
-
-
-       
-        await Shell.Current.GoToAsync($"{nameof(MainPage)}");
+        try
+        {
+            if (!string.IsNullOrEmpty(_login.Text) && !string.IsNullOrEmpty(_password.Text))
+            {
+                var _user = await _databaseService.AuthenticateAsync(_login.Text, _password.Text);
+                var appShell = (AppShell)Shell.Current;
+                await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+                appShell.EnableMenu(); 
+            }
+            else
+            {
+                await Toast.Make("Заполните поля").Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Toast.Make("Ошибка подключения к базе данных").Show();
+        }
     }
     
     private async void CreatePolButton_Clicked(object sender, EventArgs e)

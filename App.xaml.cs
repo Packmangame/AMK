@@ -1,5 +1,4 @@
-﻿using AMK.Models.Data;
-using AMK.Models.ViewModels;
+﻿using AMK.Models.ViewModels;
 using AMK.Services;
 using AMK.Views;
 

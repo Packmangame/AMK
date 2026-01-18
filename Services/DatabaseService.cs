@@ -378,6 +378,33 @@ namespace AMK.Services
                 return 0;
             }
         }
+
+        public async Task<User> AuthenticateAsync(string login, string password)
+        {
+            try
+            {
+                // Находим пользователя по логину
+                var user = await GetUserByLoginAsync(login);
+                if (user != null)
+                {
+                    // Загружаем связанные данные
+                    user.RoleDetail = await GetRoleByIdAsync(user.Role);
+                    user.DepartmentDetail = await GetDepartmentByIdAsync(user.Department);
+                    await Toast.Make($"Успешно").Show();
+                    return user;
+                }
+                else
+                {
+                    await Toast.Make("Пользователь не найден").Show();
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Ошибка аутентификации: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
     
