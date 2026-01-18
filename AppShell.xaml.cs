@@ -17,8 +17,8 @@ namespace AMK
             //Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
 
 
-           // FlyoutBehavior = FlyoutBehavior.Disabled;
-            CurrentItem = MainPageTab;
+            FlyoutBehavior = FlyoutBehavior.Disabled;
+            CurrentItem = LoginPageTab;
 
 
 

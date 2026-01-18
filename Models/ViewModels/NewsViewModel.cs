@@ -9,17 +9,19 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 namespace AMK.Models.ViewModels
 {
-    public partial class NewsViewModel : INotifyPropertyChanged /*ObservableObject*/
+    public partial class NewsViewModel : INotifyPropertyChanged 
     {
         
 
         private readonly INewsService _newsService;
+
 
         private ObservableCollection<RssNewsItems> _newsItems = new();
         private bool _isLoading;
         private bool _hasError;
         private string _errorMessage = string.Empty;
         private bool _hasMoreNews = true;
+
 
         public ObservableCollection<RssNewsItems> NewsItems
         {

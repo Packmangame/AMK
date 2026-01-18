@@ -12,5 +12,6 @@ namespace AMK.Services
     {
         Task<List<RssNewsItems>> LoadNewsFromFeedAsync(string feedUrl, string sourceName);
         Task<List<RssNewsItems>> LoadAllNewsAsync();
+        
     }
 }

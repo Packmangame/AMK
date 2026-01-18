@@ -19,11 +19,13 @@ namespace AMK.Services
             CurrentUser = user;
         }
 
-        //вывод
-        //SessionService.Instance.SetCurrentUser(_user);
-
-        //прием
-        //private User _currentUser;
-        //_currentUser = UserSessionService.Instance.CurrentUser;
+       
     }
+
+    //вывод
+    //SessionService.Instance.SetCurrentUser(_user);
+
+    //прием
+    //private User _currentUser;
+    //_currentUser = UserSessionService.Instance.CurrentUser;
 }

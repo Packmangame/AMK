@@ -23,7 +23,7 @@
         </StackLayout>
         
         <StackLayout Background="Blue" Grid.Row="2" Padding="20">
-            <Frame BackgroundColor="Azure" VerticalOptions="FillAndExpand" Padding="5">
+            <Frame BackgroundColor="Azure" VerticalOptions="FillAndExpand" Padding="5" >
                 
                 
                 
