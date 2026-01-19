@@ -5,9 +5,7 @@
              xmlns:viewmodels="clr-namespace:AMK.Models.ViewModels"
              Title="EditDatabase">
 
-    <ContentPage.BindingContext>
-        <!--<viewmodels:UsersViewModel />-->
-    </ContentPage.BindingContext>
+
 
     <Grid>
         <Grid.RowDefinitions>
@@ -60,9 +58,9 @@
                                          Grid.Row="1"
                                          Spacing="4">
                                 <Label Text="{Binding Email, StringFormat='📧 {0}'}" 
-                                       IsVisible="{Binding Email, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                       IsVisible="{Binding Email}"/>
                                 <Label Text="{Binding Phone, StringFormat='📱 {0}'}" 
-                                       IsVisible="{Binding Phone, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                       IsVisible="{Binding Phone}"/>
                             </StackLayout>
 
                         </Grid>

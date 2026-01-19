@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AMK.Models.Headlines"
+             xmlns:viewmodels="clr-namespace:AMK.Models.ViewModels"
              x:Class="AMK.Views.OurNewsPage"
              Title="OurNewsPage">
+
+
     <Grid x:Name="Place">
         <Grid.RowDefinitions>
             <!--реализация CRUD-->
@@ -10,6 +14,77 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-   
+        <RefreshView Grid.Row="0"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshNewsCommand}"
+                     IsVisible="{Binding IsLoading}">
+            <CollectionView ItemsSource="{Binding NewsItems}"
+                            SelectedItem="{Binding SelectedNews}"
+                            SelectionMode="Single">
+
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="20">
+                        <Label Text="📰"
+                               FontSize="48"
+                               HorizontalOptions="Center"
+                               TextColor="Gray"/>
+                        <Label Text="Новостей пока нет"
+                               FontSize="16"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Здесь будут отображаться новости компании"
+                               FontSize="14"
+                               TextColor="Gray"
+                               HorizontalOptions="Center"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:News">
+                        <Frame Padding="15"
+                               Margin="10,5"
+                               CornerRadius="10"
+                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2B2B2B}"
+                               BorderColor="#2196F3">
+
+                            <StackLayout Spacing="8">
+                                <!-- Заголовок и дата -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Title}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="#2196F3"
+                                           LineBreakMode="TailTruncation"/>
+
+                                    <Label Grid.Column="1"
+                                           Text="{Binding PublishDate, StringFormat='{0:dd.MM.yyyy}'}"
+                                           FontSize="12"
+                                           TextColor="Gray"/>
+                                </Grid>
+
+                                <!-- Краткое описание -->
+                                <Label Text="{Binding ShortDescription}"
+                                       FontSize="14"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2"/>
+
+                                <!-- Автор и дата создания -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding AuthorID, StringFormat='Автор ID: {0}'}"
+                                           FontSize="12"
+                                           TextColor="Gray"/>
+
+                                    <Label Grid.Column="1"
+                                           Text="{Binding CreatedAt, StringFormat='{0:dd.MM.yyyy}'}"
+                                           FontSize="10"
+                                           TextColor="LightGray"/>
+                                </Grid>
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </Grid>
 </ContentPage>

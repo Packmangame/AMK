@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace AMK.Services
 {
-    internal class CompanyNews: ICompanyNews
+    public class CompanyNews: ICompanyNews
     {
+        public CompanyNews(string dbPath)
+        {
+            _database = new SQLiteAsyncConnection(dbPath);
+            InitializeDatabaseAsync();
+        }
+
         private SQLiteAsyncConnection _database;
 
         private async Task InitializeDatabaseAsync()

@@ -12,11 +12,10 @@ using System.Windows.Input;
 
 namespace AMK.Models.ViewModels
 {
-    public partial class CompanyNewsModel: ObservableObject
+    public partial class CompanyNewsModel : ObservableObject
     {
-        private readonly ICompanyNews _newsRepository;
-        private readonly SessionService _sessionService;
-
+        ICompanyNews _companyNews;
+        SessionService _sessionService;
         [ObservableProperty]
         private ObservableCollection<News> _newsItems = new();
 
@@ -30,13 +29,13 @@ namespace AMK.Models.ViewModels
         private bool _isRefreshing;
 
         [ObservableProperty]
-        private string _errorMessage;
-
-        [ObservableProperty]
         private bool _hasError;
 
         [ObservableProperty]
         private bool _isEditMode;
+
+        [ObservableProperty]
+        private string _errorMessage;
 
         [ObservableProperty]
         private string _title;
@@ -59,21 +58,20 @@ namespace AMK.Models.ViewModels
         public ICommand CancelEditCommand { get; }
         public ICommand SelectNewsCommand { get; }
 
-        //public NewsViewModel(ICompanyNews newsRepository, SessionService sessionService)
-        //{
-        //    _newsRepository = newsRepository;
-        //    _sessionService = sessionService;
 
-        //    LoadNewsCommand = new AsyncRelayCommand(LoadNewsAsync);
-        //    //RefreshNewsCommand = new AsyncRelayCommand(RefreshNewsAsync);
-        //    //AddNewsCommand = new RelayCommand(StartAddNews);
-        //    //EditNewsCommand = new RelayCommand(StartEditNews);
-        //    //SaveNewsCommand = new AsyncRelayCommand(SaveNewsAsync);
-        //    //DeleteNewsCommand = new AsyncRelayCommand(DeleteNewsAsync);
-        //    //CancelEditCommand = new RelayCommand(CancelEdit);
-        //    //SelectNewsCommand = new RelayCommand<News>(SelectNews);
-        //}
+        public CompanyNewsModel()
+        {
+            LoadNewsCommand = new AsyncRelayCommand(LoadNewsAsync);
+            RefreshNewsCommand = new AsyncRelayCommand(RefreshNewsAsync);
+            AddNewsCommand = new RelayCommand(StartAddNews);
+            EditNewsCommand = new RelayCommand(StartEditNews);
+            SaveNewsCommand = new AsyncRelayCommand(SaveNewsAsync);
+            DeleteNewsCommand = new AsyncRelayCommand(DeleteNewsAsync);
+            CancelEditCommand = new RelayCommand(CancelEdit);
+            SelectNewsCommand = new RelayCommand<News>(SelectNews);
+        }
 
+       
         private async Task LoadNewsAsync()
         {
             if (IsLoading) return;
@@ -84,7 +82,7 @@ namespace AMK.Models.ViewModels
 
             try
             {
-                var newsList = await _newsRepository.GetAllNewsAsync();
+                var newsList = await _companyNews.GetAllNewsAsync();
 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
@@ -105,6 +103,151 @@ namespace AMK.Models.ViewModels
                 IsLoading = false;
                 IsRefreshing = false;
             }
+        }
+
+        private async Task RefreshNewsAsync()
+        {
+            IsRefreshing = true;
+            await LoadNewsAsync();
+        }
+
+        private async Task SaveNewsAsync()
+        {
+            if (string.IsNullOrWhiteSpace(Title) ||
+                string.IsNullOrWhiteSpace(Content) ||
+                string.IsNullOrWhiteSpace(ShortDescription))
+            {
+                ErrorMessage = "Заполните все обязательные поля";
+                HasError = true;
+                return;
+            }
+
+            try
+            {
+                var currentUser = _sessionService.CurrentUser;
+                if (currentUser == null)
+                {
+                    ErrorMessage = "Пользователь не авторизован";
+                    HasError = true;
+                    return;
+                }
+
+                if (SelectedNews == null)
+                {
+                    // Добавление новой новости
+                    var newNews = new News
+                    {
+                        Title = Title,
+                        Content = Content,
+                        ShortDescription = ShortDescription,
+                        AuthorID = currentUser.ID_user,
+                        PublishDate = PublishDate,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    var result = await _companyNews.AddNewsAsync(newNews);
+                    if (result > 0)
+                    {
+                        await LoadNewsAsync();
+                        CancelEdit();
+                    }
+                }
+                else
+                {
+                    // Редактирование существующей новости
+                    SelectedNews.Title = Title;
+                    SelectedNews.Content = Content;
+                    SelectedNews.ShortDescription = ShortDescription;
+                    SelectedNews.PublishDate = PublishDate;
+
+                    var result = await _companyNews.UpdateNewsAsync(SelectedNews);
+                    if (result > 0)
+                    {
+                        await LoadNewsAsync();
+                        CancelEdit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Ошибка сохранения: {ex.Message}";
+                HasError = true;
+            }
+        }
+
+        private async Task DeleteNewsAsync()
+        {
+            if (SelectedNews == null) return;
+
+            bool confirm = await Application.Current.MainPage.DisplayAlert(
+                "Подтверждение",
+                $"Вы действительно хотите удалить новость \"{SelectedNews.Title}\"?",
+                "Да",
+                "Нет");
+
+            if (!confirm) return;
+
+            try
+            {
+                var result = await _companyNews.DeleteNewsAsync(SelectedNews.ID_news);
+                if (result > 0)
+                {
+                    NewsItems.Remove(SelectedNews);
+                    SelectedNews = null;
+                    CancelEdit();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Ошибка удаления: {ex.Message}";
+                HasError = true;
+            }
+        }
+        private void CancelEdit()
+        {
+            IsEditMode = false;
+            SelectedNews = null;
+            ClearForm();
+        }
+
+        private void SelectNews(News news)
+        {
+            SelectedNews = news;
+            IsEditMode = false;
+        }
+
+        private void ClearForm()
+        {
+            Title = string.Empty;
+            Content = string.Empty;
+            ShortDescription = string.Empty;
+            PublishDate = DateTime.Now;
+        }
+
+        partial void OnSelectedNewsChanged(News value)
+        {
+            OnPropertyChanged(nameof(IsNewsSelected));
+        }
+
+        public bool IsNewsSelected => SelectedNews != null;
+
+        private void StartAddNews()
+        {
+            IsEditMode = true;
+            SelectedNews = null;
+            ClearForm();
+            PublishDate = DateTime.Now;
+        }
+
+        private void StartEditNews()
+        {
+            if (SelectedNews == null) return;
+
+            IsEditMode = true;
+            Title = SelectedNews.Title;
+            Content = SelectedNews.Content;
+            ShortDescription = SelectedNews.ShortDescription;
+            PublishDate = SelectedNews.PublishDate;
         }
     }
 }

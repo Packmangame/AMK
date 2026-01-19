@@ -24,16 +24,51 @@
         
         <StackLayout Background="Blue" Grid.Row="2" Padding="20">
             <Frame BackgroundColor="Azure" VerticalOptions="FillAndExpand" Padding="5" >
-                
-                
-                
-                
-                <!--последняя кнопка-->
-                <StackLayout Orientation="Horizontal">
-                    <Image Source="#"/>
-                    <Button Text="Редактировать БД" Clicked="EditBd"/>
+                <StackLayout>
+
+                    <StackLayout Spacing="8">
+                    <Label Text="{Binding UserName, StringFormat='Имя: {0}'}" 
+                        FontSize="16"/>
+                    <Label Text="{Binding UserEmail, StringFormat='Email: {0}'}" 
+                        FontSize="16"/>
+                    <Label Text="{Binding UserRole, StringFormat='Роль: {0}'}" 
+                        FontSize="16"/>
                 </StackLayout>
-            </Frame>
+
+                <StackLayout Orientation="Horizontal" 
+                                 Spacing="10"
+                                 VerticalOptions="Center">
+                    <Image Source="#" 
+                               HeightRequest="24"
+                               WidthRequest="24"
+                               VerticalOptions="Center"/>
+                    <Button Text="Помощь" 
+                                Clicked="OnHelpClicked"
+                                HorizontalOptions="FillAndExpand"
+                                BackgroundColor="Transparent"
+                                TextColor="Black"/>
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal" 
+                                 Spacing="10"
+                                 VerticalOptions="Center">
+                    <Image Source="logout.png" 
+                               HeightRequest="24"
+                               WidthRequest="24"
+                               VerticalOptions="Center"/>
+                    <Button Text="Выйти" 
+                                Clicked="OnLogoutClicked"
+                                HorizontalOptions="FillAndExpand"
+                                BackgroundColor="Transparent"
+                                TextColor="Red"/>
+                </StackLayout>
+
+                <StackLayout Orientation = "Horizontal" x:Name="EditBD_Frame" IsVisible="False">
+                    <Image Source = "#" />
+                    <Button Text = "Редактировать БД" Clicked = "EditBd" />
+                </ StackLayout >
+        </StackLayout>
+        </Frame>
         </StackLayout>
     </Grid>
 </ContentPage>
