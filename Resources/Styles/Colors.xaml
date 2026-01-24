@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Brand palette (from Image 1) -->
+    <Color x:Key="BrandPrimary">#2767E9</Color>
+    <Color x:Key="BrandPrimaryLight">#9AADF6</Color>
+    <Color x:Key="BrandAccent">#FE6A3F</Color>
+    <Color x:Key="AppBackground">#F5F5F8</Color>
+    <Color x:Key="TextPrimary">#0D0106</Color>
+
+    <!-- Used by template styles (Headline/SubHeadline) -->
+    <Color x:Key="MidnightBlue">#2767E9</Color>
+
+    <!-- Functional -->
+    <Color x:Key="White">#FFFFFF</Color>
+    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="Danger">#D7263D</Color>
+    <Color x:Key="Success">#1FAD66</Color>
+
+    <!-- Neutral -->
+    <Color x:Key="Gray100">#F1F2F4</Color>
+    <Color x:Key="Gray200">#E5E7EB</Color>
+    <Color x:Key="Gray300">#D1D5DB</Color>
+    <Color x:Key="Gray400">#9CA3AF</Color>
+    <Color x:Key="Gray500">#6B7280</Color>
+    <Color x:Key="Gray600">#4B5563</Color>
+    <Color x:Key="Gray700">#374151</Color>
+    <Color x:Key="Gray900">#111827</Color>
+    <Color x:Key="Gray950">#0B1220</Color>
+
+    <!-- Additional keys referenced by Shell/Page styles -->
+    <Color x:Key="OffBlack">#0D0106</Color>
+    <Color x:Key="Magenta">#FE6A3F</Color>
+
+    <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimary}" />
+    <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource BrandAccent}" />
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource AppBackground}" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+
+    <!-- Backward-compatible keys used by existing styles -->
+    <Color x:Key="Primary">#2767E9</Color>
+    <Color x:Key="PrimaryDark">#9AADF6</Color>
+    <Color x:Key="PrimaryDarkText">#0D0106</Color>
+    <Color x:Key="Secondary">#9AADF6</Color>
+    <Color x:Key="SecondaryDarkText">#0D0106</Color>
+    <Color x:Key="Tertiary">#FE6A3F</Color>
+</ResourceDictionary>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.ProfilePage"
+             Title="Профиль"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+
+        <Frame Grid.Row="0" Style="{StaticResource CardFrame}" Padding="18">
+            <StackLayout Spacing="6">
+                <Label Text="{Binding CurrentUser.FIO}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                <Label Text="{Binding CurrentUser.DepartmentDetail.DepartmentName}" FontSize="13" TextColor="{StaticResource Gray600}" />
+                <Label Text="{Binding CurrentUser.RoleDetail.Title, StringFormat='Роль: {0}'}" FontSize="12" TextColor="{StaticResource Gray500}" />
+            </StackLayout>
+        </Frame>
+
+        <StackLayout Grid.Row="1" Spacing="10">
+
+            <Button Text="Редактировать профиль" Style="{StaticResource PrimaryButton}" Command="{Binding OpenEditProfileCommand}" />
+
+            <Frame Style="{StaticResource CardFrame}" Padding="14" IsVisible="{Binding IsAdmin}">
+                <StackLayout Spacing="10">
+                    <Label Text="Администрирование" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <Button Text="Сотрудники (CRUD)" Style="{StaticResource SecondaryButton}" Command="{Binding OpenEmployeesCommand}" />
+                    <Button Text="Новости компании (CRUD)" Style="{StaticResource SecondaryButton}" Command="{Binding OpenCompanyNewsAdminCommand}" />
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+
+        <Button Grid.Row="2" Text="Выйти" Style="{StaticResource DangerButton}" Command="{Binding LogoutCommand}" />
+
+    </Grid>
+</ContentPage>

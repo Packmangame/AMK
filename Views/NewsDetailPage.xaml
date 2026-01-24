@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.NewsDetailPage">
+    <Grid>
+        
+        <WebView x:Name="NewsWebView"
+                 Source="{Binding NewsUrl}"
+                 Navigating="OnWebViewNavigating"
+                 Navigated="OnWebViewNavigated" />
+
+        
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsVisible="False"
+                           IsRunning="False"
+                           Color="Gainsboro"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           WidthRequest="50"
+                           HeightRequest="50" />
+
+       
+    </Grid>
+</ContentPage>

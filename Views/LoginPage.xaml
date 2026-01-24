@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.LoginPage">
+
+    <VerticalStackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+        <Grid HeightRequest="60" Padding="10">
+
+            <Image Source="amklogo.svg"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
+
+        </Grid>
+        <Frame HorizontalOptions="Center" VerticalOptions="Center">
+            <StackLayout>
+                <Label Text="Добро пожаловать в AMK-team!" FontSize="18"  HorizontalOptions="Center"/>
+
+                <StackLayout Orientation="Vertical" Margin="10">
+                    <Entry Placeholder="Логин" x:Name="_login"/>
+                    <Entry Placeholder="Пароль" x:Name="_password" IsPassword="True"/>
+                   
+                    <StackLayout Orientation="Vertical" Spacing="15" VerticalOptions="End">
+                        <Button Text="Войти" Clicked="EnterButton_Clicked"/>
+                        <Button Text="Создать пользователя" Clicked="CreatePolButton_Clicked"/>
+                        <Button Text="Создать администратора" Clicked="CreateAdminButton_Clicked"/>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </VerticalStackLayout>
+</ContentPage>

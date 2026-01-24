@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AMK.Views.MainPage"
+             Title="Авто новости"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <StackLayout Padding="16,12" Spacing="6">
+            <Label Text="Последние авто новости"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}" />
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <ActivityIndicator Grid.Column="0"
+                                   IsVisible="{Binding IsLoading}"
+                                   IsRunning="{Binding IsLoading}"
+                                   VerticalOptions="Center" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding ErrorMessage}"
+                       TextColor="{StaticResource Danger}"
+                       IsVisible="{Binding HasError}"
+                       FontSize="13"
+                       VerticalOptions="Center" />
+            </Grid>
+        </StackLayout>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsLoading}">
+
+            <CollectionView ItemsSource="{Binding NewsItems}"
+                            SelectionMode="None"
+                            Margin="0,0,0,8">
+
+                <CollectionView.EmptyView>
+                    <Grid Padding="20" VerticalOptions="Center">
+                        <Label Text="Загрузка новостей..."
+                               HorizontalOptions="Center"
+                               TextColor="{StaticResource Gray600}" />
+                    </Grid>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Style="{StaticResource CardFrame}"
+                               Margin="16,8"
+                               Padding="12">
+
+                            <Grid RowDefinitions="Auto,Auto,Auto"
+                                  ColumnDefinitions="90,*"
+                                  ColumnSpacing="12"
+                                  RowSpacing="6">
+
+                                <Frame Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                       CornerRadius="12"
+                                       Padding="0"
+                                       HasShadow="False"
+                                       BorderColor="{StaticResource Gray200}"
+                                       BackgroundColor="{StaticResource Gray100}"
+                                       HeightRequest="90" WidthRequest="90">
+                                    <Image Aspect="AspectFill">
+                                        <Image.Source>
+                                            <UriImageSource Uri="{Binding ImageUrl}"
+                                                            CacheValidity="1:00:00"
+                                                            CachingEnabled="True" />
+                                        </Image.Source>
+                                    </Image>
+                                </Frame>
+
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding Title}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding ReadColor}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2" />
+
+                                <Label Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding Description}"
+                                       FontSize="13"
+                                       TextColor="{StaticResource Gray600}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="3" />
+
+                                <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Source}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource Gray500}"
+                                           VerticalOptions="Center" />
+
+                                    <Button Grid.Column="1"
+                                            Text="Читать"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Padding="14,8"
+                                            Clicked="OnReadNewsClicked" />
+                                </Grid>
+
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.Footer>
+                    <StackLayout Padding="16,8" Spacing="10">
+                        <Button Text="Загрузить еще"
+                                Style="{StaticResource SecondaryButton}"
+                                IsVisible="{Binding HasMoreNews}"
+                                Command="{Binding LoadMoreCommand}" />
+                    </StackLayout>
+                </CollectionView.Footer>
+
+            </CollectionView>
+        </RefreshView>
+
+    </Grid>
+</ContentPage>
