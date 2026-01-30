@@ -16,5 +16,11 @@ namespace AMK.Services
         Task<int> UpdateNewsAsync(News news);
         Task<int> DeleteNewsAsync(int id);
         Task<bool> NewsExistsAsync(int id);
+
+        // Media
+        Task<List<NewsMedia>> GetMediaForNewsAsync(int newsId);
+        Task<int> AddMediaAsync(NewsMedia media);
+        Task<int> DeleteMediaAsync(int mediaId);
+        Task<int> DeleteMediaByNewsAsync(int newsId);
     }
 }

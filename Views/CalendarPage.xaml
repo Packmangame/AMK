@@ -2,6 +2,41 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AMK.Views.CalendarPage"
-             Title="CalendarPage">
-  
+             Title="Календарь"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16" RowSpacing="12">
+
+        <!-- Hero / header -->
+        <Frame Grid.Row="0" Style="{StaticResource CardFrame}" Padding="18" BackgroundColor="{StaticResource Gray100}">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*" RowSpacing="6">
+                <Label Text="Календарь" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                <Label Grid.Row="1" Text="Ближайшие события компании и дни рождения" FontSize="13" TextColor="{StaticResource Gray600}" />
+            </Grid>
+        </Frame>
+
+        <!-- Table header -->
+        <Grid Grid.Row="1" ColumnDefinitions="110,*" Padding="12,10" BackgroundColor="{StaticResource BrandAccent}" >
+            <Label Text="Дата" FontAttributes="Bold" TextColor="White" />
+            <Label Grid.Column="1" Text="Описание" FontAttributes="Bold" TextColor="White" />
+        </Grid>
+
+        <!-- Events list -->
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsLoading}" Command="{Binding LoadCommand}">
+            <CollectionView ItemsSource="{Binding UpcomingEvents}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="110,*" Padding="12,10" BackgroundColor="White">
+                            <Label Text="{Binding Date, StringFormat='{0:dd.MM}'}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="{Binding Description}" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="2" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Notifications -->
+        <Button Grid.Row="3" Text="Уведомления" Style="{StaticResource PrimaryButton}" Command="{Binding NotifyCommand}" />
+
+    </Grid>
 </ContentPage>

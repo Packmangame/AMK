@@ -1,37 +1,93 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AMK.Models.Headlines"
              x:Class="AMK.Views.EditCompanyNewsPage"
-             Title="EditCompanyNewsPage">
+             x:Name="ThisPage"
+             Title="Управление новостями">
 
+    <ScrollView>
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="16">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
+        
+        <StackLayout Spacing="16">
+            <Label Text="Новости компании" FontSize="20" FontAttributes="Bold" VerticalOptions="Center"/>
+            <Button  Text="Обновить" Style="{StaticResource SecondaryButton}" Command="{Binding LoadCommand}"/>
+            <Button Text="Новая" Style="{StaticResource PrimaryButton}" Clicked="Button_Clicked"/>
+        </StackLayout>
 
-        <Frame Grid.Row="0">
-            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                <Button Grid.Column="0" 
-                        Text="Обновить" 
-                        Command="{Binding LoadNewsCommand}" />
+        <!-- List -->
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Items}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:News">
+                    <Frame Style="{StaticResource CardFrame}" Padding="12" Margin="0,0,0,10">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="10">
+                            <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="14" Grid.ColumnSpan="2"/>
+                            <Label Grid.Row="1" Text="{Binding ShortDescription}" FontSize="12" TextColor="{StaticResource Gray600}" LineBreakMode="TailTruncation"/>
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="6" HorizontalOptions="End">
+                                <Button Text="✎" Style="{StaticResource SecondaryButton}" Padding="8,6"
+                                        Command="{Binding BindingContext.StartEditCommand, Source={x:Reference Name=ThisPage}}"
+                                        CommandParameter="{Binding .}" />
+                                <Button Text="🗑" Style="{StaticResource DangerButton}" Padding="8,6"
+                                        Command="{Binding BindingContext.DeleteCommand, Source={x:Reference Name=ThisPage}}"
+                                        CommandParameter="{Binding .}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
-                <Button Grid.Column="1" 
-                        Text="Добавить" 
-                        Command="{Binding AddNewsCommand}" />
+        <!-- Editor -->
+        <ScrollView x:Name="Editor" Grid.Row="1" IsVisible="False">           
+            <VerticalStackLayout Spacing="12">
+                <Frame Style="{StaticResource CardFrame}" Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                                              
+                        <Label Text="Заголовок" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                        <Entry Text="{Binding Title}" Placeholder="Заголовок"/>
 
-                <Button Grid.Column="2" 
-                        Text="Редактировать" 
-                        Command="{Binding EditNewsCommand}" 
-                        IsEnabled="{Binding IsNewsSelected}"/>
+                        <Label Text="Краткое описание" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                        <Editor Text="{Binding ShortDescription}" AutoSize="TextChanges" Placeholder="Кратко о новости"/>
 
-                <Button Grid.Column="3" 
-                        Text="Удалить" 
-                        Command="{Binding DeleteNewsCommand}" 
-                        IsEnabled="{Binding IsNewsSelected}"/>
-            </Grid>
-        </Frame>
+                        <Label Text="Текст" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                        <Editor Text="{Binding Content}" AutoSize="TextChanges" Placeholder="Текст новости"/>
 
+                        <Label Text="Дата публикации" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                        <DatePicker Date="{Binding PublishDate}"/>
+
+                        <Label Text="Медиа" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                        <Button Text="Добавить файл" Style="{StaticResource SecondaryButton}" Command="{Binding AddMediaCommand}"/>
+
+                        <CollectionView ItemsSource="{Binding Media}" SelectionMode="None" Margin="0,6,0,0">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:NewsMedia">
+                                    <Frame Style="{StaticResource CardFrame}" Padding="0" HeightRequest="100" WidthRequest="140" IsClippedToBounds="True">
+                                        <Grid>
+                                            <Image Source="{Binding MediaUrl}" Aspect="AspectFill" IsVisible="{Binding IsImage}" />
+
+                                            <Grid IsVisible="{Binding IsImage, Converter={StaticResource InverseBoolConverter}}"
+                                                  Padding="10" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                                <Image Source="{Binding IconUrl}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                                                <Label Grid.Column="1" Text="{Binding Caption}" FontSize="12" LineBreakMode="TailTruncation" />
+                                            </Grid>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Button Text="Сохранить" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
+    </ScrollView>
 </ContentPage>

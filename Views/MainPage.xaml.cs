@@ -7,23 +7,21 @@ namespace AMK.Views;
 
 public partial class MainPage : ContentPage
 {
-    NewsViewModel _viewModel;
-    RssNewsItems _currentArticle;
-    User _user;
-    public MainPage()
+    private readonly NewsViewModel _viewModel;
+
+    public MainPage(NewsViewModel viewModel)
     {
         InitializeComponent();
-        var newsService = new RssNewsServices();
-        _viewModel = new NewsViewModel(newsService);
+        _viewModel = viewModel;
         BindingContext = _viewModel;
-        LoadNews();
     }
-    private async void LoadNews()
+
+    protected override async void OnAppearing()
     {
-        if (_viewModel != null && !_viewModel.IsLoading)
-        {
+        base.OnAppearing();
+
+        if (_viewModel.NewsItems.Count == 0 && !_viewModel.IsLoading)
             await _viewModel.LoadNewsAsync();
-        }
     }
     private async void OnReadNewsClicked(object sender, EventArgs e)
     {
@@ -37,10 +35,5 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void OnLoadMoreClicked(object sender, EventArgs e)
-    {
-        LoadNews();
-    }
-
-   
+ 
 }

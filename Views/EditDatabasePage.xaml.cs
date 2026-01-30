@@ -1,16 +1,13 @@
 using AMK.Models.ViewModels;
-using AMK.Services;
 
 namespace AMK.Views;
 
-public partial class EditDatabase : ContentPage
+public partial class EditDatabasePage : ContentPage
 {
-    UsersViewModel _viewModel;
-
-    public EditDatabase()
+	public EditDatabasePage(UsersViewModel usersViewModel)
 	{
 		InitializeComponent();
-        BindingContext = new UsersViewModel(
-            Application.Current.Handler.MauiContext.Services.GetService<IDatabaseService>());
-    }
+		BindingContext = usersViewModel;
+	}
+    
 }

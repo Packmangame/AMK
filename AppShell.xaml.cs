@@ -8,14 +8,8 @@ namespace AMK
         {
             InitializeComponent();
 
-            //Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
-            //Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
-            //Routing.RegisterRoute(nameof(NewsDetailPage), typeof(NewsDetailPage));
-            //Routing.RegisterRoute(nameof(CalendarPage), typeof(CalendarPage));
-            //Routing.RegisterRoute(nameof(OurNewsPage), typeof(OurNewsPage));
-            ////Routing.RegisterRoute(nameof(EducationPage), typeof(EducationPage));
-            //Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
-
+            // Routes
+            Routing.RegisterRoute(nameof(CompanyNewsDetailPage), typeof(CompanyNewsDetailPage));
 
             FlyoutBehavior = FlyoutBehavior.Disabled;
             CurrentItem = LoginPageTab;

@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:AMK"
     xmlns:pages="clr-namespace:AMK.Views"
     Title="AMK"
-    Shell.TabBarIsVisible="False" BackgroundColor="ForestGreen">
+    Shell.TabBarIsVisible="False">
 
     <Shell.Resources>
         <Style x:Key="LoginPageStyle" TargetType="NavigationPage">
@@ -26,7 +26,7 @@
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
 
-            <Image Source="amklogo.png" 
+            <Image Source="amklogo.svg" 
             Grid.Column="0"
             VerticalOptions="Center"
             HorizontalOptions="Center"/>
@@ -52,8 +52,7 @@
 
             <ShellContent Title="Наши новости" 
                           Icon="home.png"
-                          
-             ContentTemplate="{DataTemplate pages:OurNewsPage}"/>
+             ContentTemplate="{DataTemplate pages:CompanyNewsPage}"/>
         </Tab>
 
         <ShellContent  Title="Календарь"
@@ -74,16 +73,21 @@
                   FlyoutItemIsVisible="False"
                   Style="{StaticResource LoginPageStyle}"/>
     
-    <ShellContent 
-                  ContentTemplate="{DataTemplate pages:EditDatabase}"
+    
+    <ShellContent x:Name="WebPageTab"
+                  ContentTemplate="{DataTemplate pages:NewsDetailPage}"
+                  Route="NewsDetail"
+                  FlyoutItemIsVisible="False"/>
+
+    <ShellContent ContentTemplate="{DataTemplate pages:EditCompanyNewsPage}"
+                  Route="EditCompNews"
+                  FlyoutItemIsVisible="False"
+        />
+
+    <ShellContent ContentTemplate="{DataTemplate pages:EditDatabasePage}"
                   Route="EditDatabase"
                   FlyoutItemIsVisible="False"/>
 
-    <ShellContent x:Name="WebPageTab"
-                  ContentTemplate="{DataTemplate pages:NewsDetailPage}"
-                  Route="NewsDetailPage"
-                  FlyoutItemIsVisible="False"/>
-    
 
 </Shell>
 

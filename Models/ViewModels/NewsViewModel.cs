@@ -21,6 +21,8 @@ namespace AMK.Models.ViewModels
         private bool _hasError;
         private string _errorMessage = string.Empty;
         private bool _hasMoreNews = true;
+        private int _skip = 0;
+        private const int PageSize = 15;
 
 
         public ObservableCollection<RssNewsItems> NewsItems
@@ -89,6 +91,7 @@ namespace AMK.Models.ViewModels
         }
 
         public ICommand RefreshCommand => new Command(async () => await RefreshNewsAsync());
+        public ICommand LoadMoreCommand => new Command(async () => await LoadMoreAsync());
 
         public NewsViewModel(INewsService newsService)
         {
@@ -97,32 +100,39 @@ namespace AMK.Models.ViewModels
 
         public async Task LoadNewsAsync()
         {
-            if (IsLoading) return;
+            await LoadFirstPageAsync();
+        }
 
+        public async Task RefreshNewsAsync()
+        {
+            await LoadFirstPageAsync();
+        }
+
+        private async Task LoadFirstPageAsync()
+        {
+            if (IsLoading) return;
             IsLoading = true;
             HasError = false;
+            ErrorMessage = string.Empty;
+            _skip = 0;
 
             try
             {
-                var news = await _newsService.LoadAllNewsAsync();
-
+                var news = await _newsService.LoadAllNewsAsync(_skip, PageSize);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     NewsItems.Clear();
                     foreach (var item in news)
-                    {
                         NewsItems.Add(item);
-                    }
 
-                   
-                    HasMoreNews = news.Count >= 10;
+                    HasMoreNews = news.Count == PageSize;
+                    _skip = NewsItems.Count;
                 });
             }
             catch (Exception ex)
             {
                 HasError = true;
                 ErrorMessage = $"Ошибка загрузки: {ex.Message}";
-                Console.WriteLine($"Ошибка RSS: {ex.Message}");
             }
             finally
             {
@@ -130,9 +140,34 @@ namespace AMK.Models.ViewModels
             }
         }
 
-        public async Task RefreshNewsAsync()
+        private async Task LoadMoreAsync()
         {
-            await LoadNewsAsync();
+            if (IsLoading || !HasMoreNews) return;
+            IsLoading = true;
+            HasError = false;
+            ErrorMessage = string.Empty;
+
+            try
+            {
+                var news = await _newsService.LoadAllNewsAsync(_skip, PageSize);
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    foreach (var item in news)
+                        NewsItems.Add(item);
+
+                    HasMoreNews = news.Count == PageSize;
+                    _skip = NewsItems.Count;
+                });
+            }
+            catch (Exception ex)
+            {
+                HasError = true;
+                ErrorMessage = $"Ошибка загрузки: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

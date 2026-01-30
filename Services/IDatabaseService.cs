@@ -17,6 +17,7 @@ namespace AMK.Services
         Task<int> UpdateUserAsync(User user); //Администратор
         Task<int> DeleteUserAsync(int userId); //Администратор
         Task<List<User>> SearchUsersAsync(string keyword); //Администратор
+        Task<User> AuthenticateAsync(string login, string password); //Вход
         #endregion
 
         #region Role CRUD

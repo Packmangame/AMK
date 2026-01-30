@@ -1,9 +1,5 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace AMK.Models.Headlines
 {
@@ -25,5 +21,42 @@ namespace AMK.Models.Headlines
         public int ID_medType { get; set; }
         
         public string Caption { get; set; }
+
+        // Convenience flags for UI rendering (not stored in DB)
+        [Ignore]
+        public bool IsImage
+        {
+            get
+            {
+                if (ID_medType == 1) return true;
+                if (string.IsNullOrWhiteSpace(MediaUrl)) return false;
+                var ext = Path.GetExtension(MediaUrl).ToLowerInvariant();
+                return ext is ".jpg" or ".jpeg" or ".png" or ".gif" or ".webp";
+            }
+        }
+
+        [Ignore]
+        public bool IsVideo
+        {
+            get
+            {
+                if (ID_medType == 2) return true;
+                if (string.IsNullOrWhiteSpace(MediaUrl)) return false;
+                var ext = Path.GetExtension(MediaUrl).ToLowerInvariant();
+                return ext is ".mp4" or ".mov" or ".m4v";
+            }
+        }
+
+        [Ignore]
+        public bool IsAudio
+        {
+            get
+            {
+                if (ID_medType == 3) return true;
+                if (string.IsNullOrWhiteSpace(MediaUrl)) return false;
+                var ext = Path.GetExtension(MediaUrl).ToLowerInvariant();
+                return ext is ".mp3" or ".wav" or ".m4a" or ".aac";
+            }
+        }
     }
 }

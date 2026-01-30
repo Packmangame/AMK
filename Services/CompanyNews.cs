@@ -5,18 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using Microsoft.Maui.Storage;
 
 namespace AMK.Services
 {
     public class CompanyNews: ICompanyNews
     {
-        public CompanyNews(string dbPath)
+        public CompanyNews()
         {
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "AMK.db3");
             _database = new SQLiteAsyncConnection(dbPath);
-            InitializeDatabaseAsync();
+            _ = InitializeDatabaseAsync();
         }
 
-        private SQLiteAsyncConnection _database;
+        private readonly SQLiteAsyncConnection _database;
 
         private async Task InitializeDatabaseAsync()
         {
@@ -39,6 +42,29 @@ namespace AMK.Services
                 await _database.InsertAllAsync(defaultTypes);
             }
 
+        }
+
+        public Task<List<NewsMedia>> GetMediaForNewsAsync(int newsId)
+        {
+            return _database.Table<NewsMedia>()
+                .Where(m => m.ID_news == newsId)
+                .OrderBy(m => m.ID_newsMedia)
+                .ToListAsync();
+        }
+
+        public Task<int> AddMediaAsync(NewsMedia media)
+        {
+            return _database.InsertAsync(media);
+        }
+
+        public Task<int> DeleteMediaAsync(int mediaId)
+        {
+            return _database.DeleteAsync<NewsMedia>(mediaId);
+        }
+
+        public Task<int> DeleteMediaByNewsAsync(int newsId)
+        {
+            return _database.Table<NewsMedia>().Where(m => m.ID_news == newsId).DeleteAsync();
         }
 
         public async Task<List<News>> GetAllNewsAsync()
@@ -83,9 +109,7 @@ namespace AMK.Services
             if (news != null)
             {
                 // Удаляем связанные медиа
-                await _database.Table<NewsMedia>()
-                    .Where(m => m.ID_news == id)
-                    .DeleteAsync();
+                await DeleteMediaByNewsAsync(id);
 
                 return await _database.DeleteAsync(news);
             }

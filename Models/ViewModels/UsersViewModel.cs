@@ -1,72 +1,72 @@
-﻿using AMK.Models.Users;
+using AMK.Models.Users;
 using AMK.Services;
+using AMK.Validation;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AMK.Models.ViewModels
 {
-    public partial class UsersViewModel: ObservableObject
+    public partial class UsersViewModel : ObservableObject
     {
         private readonly IDatabaseService _databaseService;
 
         [ObservableProperty]
-        private ObservableCollection<User> _users;
+        private ObservableCollection<User> users = new();
 
         [ObservableProperty]
-        private User _selectedUser;
+        private User selectedUser = new()
+        {
+            Birthday = DateTime.Now.AddYears(-25)
+        };
 
         [ObservableProperty]
-        private string _searchText;
+        private string searchText;
 
         [ObservableProperty]
-        private bool _isLoading;
+        private bool isLoading;
 
         [ObservableProperty]
-        private bool _isEditing;
+        private bool isEditing;
 
         [ObservableProperty]
-        private List<Role> _roles;
+        private List<Role> roles = new();
 
         [ObservableProperty]
-        private List<Department> _departments;
+        private List<Department> departments = new();
+
+        [ObservableProperty]
+        private Role selectedRole;
+
+        [ObservableProperty]
+        private Department selectedDepartment;
 
         public UsersViewModel(IDatabaseService databaseService)
         {
             _databaseService = databaseService;
-            Users = new ObservableCollection<User>();
-            SelectedUser = new User
-            {
-                Birthday = DateTime.Now.AddYears(-25)
-            };
-
-            LoadData();
+            _ = LoadDataAsync();
         }
 
         [RelayCommand]
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             try
             {
                 IsLoading = true;
 
-                // Загружаем пользователей
-                var users = await _databaseService.GetAllUsersAsync();
-                Users.Clear();
-                foreach (var user in users)
-                {
-                    Users.Add(user);
-                }
+                var usersList = await _databaseService.GetAllUsersAsync();
+                Users = new ObservableCollection<User>(usersList);
 
-                // Загружаем роли и отделы для формы
                 Roles = await _databaseService.GetAllRolesAsync();
                 Departments = await _databaseService.GetAllDepartmentsAsync();
+
+                // синхронизируем выбранные значения для пикеров
+                SelectedRole = Roles.FirstOrDefault(r => r.ID_role == SelectedUser.Role) ?? Roles.FirstOrDefault();
+                SelectedDepartment = Departments.FirstOrDefault(d => d.ID_depart == SelectedUser.Department) ?? Departments.FirstOrDefault();
+
+                if (SelectedUser == null)
+                    SelectedUser = new User { Birthday = DateTime.Now.AddYears(-25) };
             }
             catch (Exception ex)
             {
@@ -79,18 +79,19 @@ namespace AMK.Models.ViewModels
         }
 
         [RelayCommand]
-        private async Task Search()
+        private async Task RefreshAsync()
+        {
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task SearchAsync()
         {
             try
             {
                 IsLoading = true;
-                var searchResults = await _databaseService.SearchUsersAsync(SearchText);
-
-                Users.Clear();
-                foreach (var user in searchResults)
-                {
-                    Users.Add(user);
-                }
+                var results = await _databaseService.SearchUsersAsync(SearchText);
+                Users = new ObservableCollection<User>(results);
             }
             catch (Exception ex)
             {
@@ -108,9 +109,11 @@ namespace AMK.Models.ViewModels
             SelectedUser = new User
             {
                 Birthday = DateTime.Now.AddYears(-25),
-                Role = Roles?.FirstOrDefault()?.ID_role ?? 1,
-                Department = Departments?.FirstOrDefault()?.ID_depart ?? 1
+                Role = Roles.FirstOrDefault()?.ID_role ?? 1,
+                Department = Departments.FirstOrDefault()?.ID_depart ?? 1
             };
+            SelectedRole = Roles.FirstOrDefault(r => r.ID_role == SelectedUser.Role) ?? Roles.FirstOrDefault();
+            SelectedDepartment = Departments.FirstOrDefault(d => d.ID_depart == SelectedUser.Department) ?? Departments.FirstOrDefault();
             IsEditing = true;
         }
 
@@ -132,17 +135,60 @@ namespace AMK.Models.ViewModels
                 Email = user.Email,
                 Tests = user.Tests
             };
+
+            SelectedRole = Roles.FirstOrDefault(r => r.ID_role == SelectedUser.Role) ?? Roles.FirstOrDefault();
+            SelectedDepartment = Departments.FirstOrDefault(d => d.ID_depart == SelectedUser.Department) ?? Departments.FirstOrDefault();
+
             IsEditing = true;
         }
 
         [RelayCommand]
-        private async Task SaveUser()
+        private void CancelEdit()
         {
-            if (string.IsNullOrWhiteSpace(SelectedUser.FIO) ||
-                string.IsNullOrWhiteSpace(SelectedUser.Login) ||
-                string.IsNullOrWhiteSpace(SelectedUser.Password))
+            IsEditing = false;
+            SelectedUser = new User { Birthday = DateTime.Now.AddYears(-25) };
+            SelectedRole = Roles.FirstOrDefault();
+            SelectedDepartment = Departments.FirstOrDefault();
+        }
+
+        partial void OnSelectedRoleChanged(Role value)
+        {
+            if (value != null && SelectedUser != null)
+                SelectedUser.Role = value.ID_role;
+        }
+
+        partial void OnSelectedDepartmentChanged(Department value)
+        {
+            if (value != null && SelectedUser != null)
+                SelectedUser.Department = value.ID_depart;
+        }
+
+      
+
+        [RelayCommand]
+        private async Task SaveUserAsync()
+        {
+            // Валидации
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(SelectedUser?.FIO))
+                errors.Add("ФИО - обязательное поле");
+
+            if (string.IsNullOrWhiteSpace(SelectedUser?.Login) || !Validators.IsValidLogin(SelectedUser.Login))
+                errors.Add("Логин - обязательное поле (3-32 символа)");
+
+            if (string.IsNullOrWhiteSpace(SelectedUser?.Password) || !Validators.IsValidPassword(SelectedUser.Password))
+                errors.Add("Пароль: минимум 8 символов, 1 заглавная, 1 спецсимвол");
+          
+           if (!Validators.IsValidEmail(SelectedUser.Email))
+                errors.Add("Некорректный Email (пример: name@domain.ru)");
+
+            if (SelectedUser != null && !Validators.IsValidBirthDate(SelectedUser.Birthday))
+                errors.Add("Дата рождения: возраст от 16 до 120 лет");
+
+            if (errors.Count > 0)
             {
-                await Toast.Make("Заполните обязательные поля").Show();
+                await Shell.Current.DisplayAlert("Проверьте поля", string.Join("\n", errors), "OK");
                 return;
             }
 
@@ -150,26 +196,20 @@ namespace AMK.Models.ViewModels
             {
                 IsLoading = true;
 
-                int result;
                 if (SelectedUser.ID_user == 0)
                 {
-                    result = await _databaseService.CreateUserAsync(SelectedUser);
-                    if (result > 0)
-                    {
-                        await LoadData();
-                    }
+                    var created = await _databaseService.CreateUserAsync(SelectedUser);
+                    if (created > 0)
+                        await LoadDataAsync();
                 }
                 else
                 {
-                    result = await _databaseService.UpdateUserAsync(SelectedUser);
-                    if (result > 0)
-                    {
-                        await LoadData();
-                    }
+                    var updated = await _databaseService.UpdateUserAsync(SelectedUser);
+                    if (updated > 0)
+                        await LoadDataAsync();
                 }
 
-                IsEditing = false;
-                SelectedUser = new User { Birthday = DateTime.Now.AddYears(-25) };
+                CancelEdit();
             }
             catch (Exception ex)
             {
@@ -179,44 +219,38 @@ namespace AMK.Models.ViewModels
             {
                 IsLoading = false;
             }
+        }
 
-            [RelayCommand]
-             async Task DeleteUser(User user)
+        [RelayCommand]
+        private async Task DeleteUserAsync(User user)
+        {
+            if (user == null) return;
+
+            bool confirm = await Shell.Current.DisplayAlert(
+                "Подтверждение",
+                $"Вы действительно хотите удалить пользователя {user.FIO}?",
+                "Да",
+                "Нет");
+
+            if (!confirm) return;
+
+            try
             {
-                if (user == null) return;
-
-                bool confirm = await Shell.Current.DisplayAlert(
-                    "Подтверждение",
-                    $"Вы действительно хотите удалить пользователя {user.FIO}?",
-                    "Да",
-                    "Нет");
-
-                if (!confirm) return;
-
-                try
-                {
-                    IsLoading = true;
-                    var result = await _databaseService.DeleteUserAsync(user.ID_user);
-                    if (result > 0)
-                    {
-                        Users.Remove(user);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await Shell.Current.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
-                }
-                finally
-                {
-                    IsLoading = false;
-                }
+                IsLoading = true;
+                var result = await _databaseService.DeleteUserAsync(user.ID_user);
+                if (result > 0)
+                    Users.Remove(user);
             }
-
-            [RelayCommand]
-             async Task Refresh()
+            catch (Exception ex)
             {
-                await LoadData();
+                await Shell.Current.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
+
+        
     }
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AMK.Models.Headlines"
+             x:Class="AMK.Views.CompanyNewsDetailPage"
+             x:Name="ThisPage"
+             Title="Новость">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="{Binding Item.Title}" FontSize="22" FontAttributes="Bold"/>
+            <Label Text="{Binding Item.PublishDate, StringFormat='{0:dd.MM.yyyy}'}" FontSize="12" TextColor="{StaticResource Gray500}"/>
+
+            <Frame Style="{StaticResource CardFrame}" Padding="14">
+                <Label Text="{Binding Item.Content}" FontSize="14" LineBreakMode="WordWrap"/>
+            </Frame>
+
+            <Label Text="Медиа" FontAttributes="Bold"/>
+
+            <CollectionView ItemsSource="{Binding Media}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:NewsMedia">
+                        <Frame Style="{StaticResource CardFrame}" Padding="12" Margin="0,0,0,10">
+                            <Grid RowDefinitions="Auto" ColumnDefinitions="*" RowSpacing="8">
+
+                                <!-- Image preview -->
+                                <Image Source="{Binding MediaUrl}"
+                                       Aspect="AspectFill"
+                                       HeightRequest="180"
+                                       IsVisible="{Binding IsImage}" />
+
+                                <!-- Non-image (audio/video/other) -->
+                                <Grid IsVisible="{Binding IsImage, Converter={StaticResource InverseBoolConverter}}"
+                                      ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Image Source="{Binding IconUrl}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label Text="{Binding Caption}" FontAttributes="Bold" FontSize="13"/>
+                                        <Label Text="{Binding MediaUrl}" FontSize="11" TextColor="{StaticResource Gray500}" LineBreakMode="TailTruncation"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.OpenMediaCommand, Source={x:Reference Name=ThisPage}}" CommandParameter="{Binding .}"/>
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

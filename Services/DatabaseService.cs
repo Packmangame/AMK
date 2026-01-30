@@ -50,6 +50,39 @@ namespace AMK.Services
         {
             try
             {
+                if (await _database.Table<User>().CountAsync() == 0)
+                {
+                    var users = new List<User>
+                    {
+                        new User
+                        {
+                            FIO = "Админ Админович",
+                            Birthday = new DateTime(1990, 1, 1), 
+                            Department = 3,
+                            Phone = "+79991234567",
+                            Role = 1, 
+                            Login = "admin",
+                            Password ="admin",
+                            Email = "admin@example.com",
+                            Tests = null
+                        },
+                        new User
+                        {
+                            FIO = "Иван Иванов",
+                            Birthday = new DateTime(1995, 5, 15),
+                            Department = 2,
+                            Phone = "+79998765432",
+                            Role = 2,
+                            Login = "user",
+                            Password = "user",
+                            Email = "ivan@example.com",
+                            Tests = 0
+                        }
+                    };
+
+                    await _database.InsertAllAsync(users);
+                }
+
                 if (await _database.Table<Role>().CountAsync() == 0)
                 {
                     var roles = new List<Role>
@@ -387,6 +420,13 @@ namespace AMK.Services
                 var user = await GetUserByLoginAsync(login);
                 if (user != null)
                 {
+                    // Проверяем пароль
+                    if (!string.Equals(user.Password, password, StringComparison.Ordinal))
+                    {
+                        await Toast.Make("Неверный пароль").Show();
+                        return null;
+                    }
+
                     // Загружаем связанные данные
                     user.RoleDetail = await GetRoleByIdAsync(user.Role);
                     user.DepartmentDetail = await GetDepartmentByIdAsync(user.Department);

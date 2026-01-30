@@ -3,22 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AMK.Views.LoginPage">
 
-    <VerticalStackLayout>
-        <Grid HeightRequest="60" Padding="10"
-              BackgroundColor="ForestGreen">
+    <VerticalStackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+        <Grid HeightRequest="60" Padding="10">
 
-            <Image Source="amklogo.png"
+            <Image Source="amklogo.svg"
                    VerticalOptions="Center"
                    HorizontalOptions="Center"/>
 
         </Grid>
-        <Label Text="{DynamicResource _welcome}"/>
-       
-        <Editor Placeholder="{DynamicResource _login}" x:Name="_login"/>
-        <Editor Placeholder="{DynamicResource _password}" x:Name="_password"/>
-        
-        <Button Text="{DynamicResource _enter}" Clicked="EnterButton_Clicked"/>
-        <Button Text="Создать пользователя" Clicked="CreatePolButton_Clicked"/>
-        <Button Text="Создать администратора" Clicked="CreateAdminButton_Clicked"/>
+        <Frame HorizontalOptions="Center" VerticalOptions="Center">
+            <StackLayout>
+                <Label Text="Добро пожаловать в AMK-team!" FontSize="18"  HorizontalOptions="Center"/>
+
+                <StackLayout Orientation="Vertical" Margin="10">
+                    <Entry Placeholder="Логин" x:Name="_login"/>
+                    <Entry Placeholder="Пароль" x:Name="_password" IsPassword="True"/>
+                   
+                    <StackLayout Orientation="Vertical" Spacing="15" VerticalOptions="End">
+                        <Button Text="Войти" Clicked="EnterButton_Clicked"/>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
     </VerticalStackLayout>
 </ContentPage>

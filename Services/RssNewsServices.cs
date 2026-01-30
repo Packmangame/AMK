@@ -2,6 +2,9 @@
 using AMK.Models.Rss;
 using System.ServiceModel.Syndication;
 using System.Xml;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace AMK.Services
 {
@@ -16,6 +19,17 @@ namespace AMK.Services
             {
                 Timeout = TimeSpan.FromSeconds(20)
             };
+
+            // Some RSS/CDN endpoints refuse requests without a User-Agent
+            try
+            {
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("AMKApp/1.0 (+https://amk.local)");
+                _httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/rss+xml, application/xml, text/xml, */*");
+            }
+            catch
+            {
+                // ignore header parsing errors
+            }
 
             //Рабочие фиды
             _availableFeeds = new List<RssFeed>
@@ -52,15 +66,19 @@ namespace AMK.Services
 
                 var feed = SyndicationFeed.Load(xmlReader);
 
-                foreach (var item in feed.Items.Take(15))
+                // Берём больше элементов, чтобы работала пагинация на уровне приложения
+                foreach (var item in feed.Items.Take(60))
                 {
+                    var rawImageUrl = ExtractImageUrl(item);
+                    var articleUrl = item.Links.FirstOrDefault()?.Uri?.ToString();
+
                     var newsItem = new RssNewsItems
                     {
                         Title = item.Title?.Text ?? "Без заголовка",
                         Description = ExtractDescription(item),
-                        ImageUrl = ExtractImageUrl(item),
+                        ImageUrl = NormalizeImageUrl(rawImageUrl, feedUrl, articleUrl),
                         PublishDate = item.PublishDate.DateTime,
-                        Link = item.Links.FirstOrDefault()?.Uri?.ToString() ?? string.Empty,
+                        Link = articleUrl ?? string.Empty,
                         Source = sourceName,
                         IsRead = false
                     };
@@ -85,7 +103,7 @@ namespace AMK.Services
             return newsItems;
         }
 
-        public async Task<List<RssNewsItems>> LoadAllNewsAsync()
+        public async Task<List<RssNewsItems>> LoadAllNewsAsync(int skip, int take)
         {
             var allNews = new List<RssNewsItems>();
             var tasks = new List<Task<List<RssNewsItems>>>();
@@ -102,12 +120,14 @@ namespace AMK.Services
                 allNews.AddRange(newsList);
             }
 
-            return allNews.OrderByDescending(n => n.PublishDate)
-                .Take(15)
+            return allNews
+                .OrderByDescending(n => n.PublishDate)
+                .Skip(Math.Max(0, skip))
+                .Take(Math.Max(0, take))
                 .ToList();
         }
 
-         string ExtractDescription(SyndicationItem item)
+        private string ExtractDescription(SyndicationItem item)
         {
             // Пробуем разные варианты получения описания
             if (!string.IsNullOrEmpty(item.Summary?.Text))
@@ -116,70 +136,152 @@ namespace AMK.Services
             if (item.Content is TextSyndicationContent textContent)
                 return textContent.Text;
 
-            // Пробуем извлечь из расширенных элементов
-            var elementExtensions = item.ElementExtensions;
-            foreach (var extension in elementExtensions)
+            // Пробуем извлечь из расширенных элементов (content:encoded, description, etc.)
+            foreach (var extension in item.ElementExtensions)
             {
-                if (extension.OuterName == "description" || extension.OuterName == "encoded")
+                if (extension.OuterName is not ("description" or "encoded" or "content"))
+                    continue;
+
+                try
                 {
-                    var content = extension.GetObject<string>();
-                    if (!string.IsNullOrEmpty(content))
-                        return content;
+                    var el = extension.GetObject<XElement>();
+                    var v = el?.Value;
+                    if (!string.IsNullOrWhiteSpace(v))
+                        return v;
+                }
+                catch
+                {
+                    // fall back
+                }
+
+                try
+                {
+                    var s = extension.GetObject<string>();
+                    if (!string.IsNullOrWhiteSpace(s))
+                        return s;
+                }
+                catch
+                {
+                    // ignore
                 }
             }
 
             return string.Empty;
         }
 
-        string ExtractImageUrl(SyndicationItem item)
+        private string ExtractImageUrl(SyndicationItem item)
         {
             try
             {
-                //(Media RSS)
-                var mediaExtensions = item.ElementExtensions
-                    .Where(x => x.OuterName == "thumbnail" || x.OuterName == "content")
-                    .ToList();
-
-                foreach (var extension in mediaExtensions)
+                // 1) enclosure links (often contain image URLs)
+                foreach (var link in item.Links)
                 {
-                    var element = extension.GetObject<System.Xml.Linq.XElement>();
-                    var urlAttr = element?.Attribute("url");
-                    if (urlAttr != null && !string.IsNullOrEmpty(urlAttr.Value))
-                    {
-                        if (urlAttr.Value.StartsWith("http"))
-                            return urlAttr.Value;
-                    }
+                    if (!string.Equals(link.RelationshipType, "enclosure", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var uri = link.Uri?.ToString();
+                    if (string.IsNullOrWhiteSpace(uri))
+                        continue;
+
+                    // If MediaType not set, still accept common image extensions
+                    if (!string.IsNullOrWhiteSpace(link.MediaType) && !link.MediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    return uri;
+                }
+
+                // 2) Media RSS extensions: media:thumbnail, media:content, enclosure, etc.
+                foreach (var extension in item.ElementExtensions)
+                {
+                    if (extension.OuterName is not ("thumbnail" or "content" or "enclosure" or "image"))
+                        continue;
+
+                    var url = TryReadUrlFromExtension(extension);
+                    if (!string.IsNullOrWhiteSpace(url))
+                        return url;
                 }
 
                 //HTML описания
                 var description = ExtractDescription(item);
-                var match = System.Text.RegularExpressions.Regex.Match(description,@"<img[^>]+src=[""']([^""']+)[""']",
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var match = Regex.Match(description, @"<img[^>]+src\s*=\s*[""']([^""']+)[""']", RegexOptions.IgnoreCase);
 
                 if (match.Success)
                     return match.Groups[1].Value;
 
-                return "https://via.placeholder.com/150/CCCCCC/808080?text=Нет+фото";
+                return "https://avatars.mds.yandex.net/i?id=4557b5d4094c2fc4f1ddd2ed249a764f60b1c8f3-16326063-images-thumbs&n=13";
             }
             catch
             {
-                return "https://via.placeholder.com/150/CCCCCC/808080?text=Нет+фото";
+                return "https://avatars.mds.yandex.net/i?id=4557b5d4094c2fc4f1ddd2ed249a764f60b1c8f3-16326063-images-thumbs&n=13";
             }
         }
 
-        string CleanHtml(string html)
+        private static string TryReadUrlFromExtension(SyndicationElementExtension extension)
+        {
+            try
+            {
+                var el = extension.GetObject<XElement>();
+                if (el == null)
+                    return null;
+
+                // Most common attributes for media urls
+                var url = el.Attribute("url")?.Value
+                          ?? el.Attribute("href")?.Value
+                          ?? el.Attribute(XName.Get("url"))?.Value
+                          ?? el.Attribute(XName.Get("href"))?.Value;
+
+                if (!string.IsNullOrWhiteSpace(url))
+                    return url;
+            }
+            catch
+            {
+                // ignore
+            }
+
+            return null;
+        }
+
+        private string NormalizeImageUrl(string url, string? baseUrl, string? articleUrl)
+        {
+            const string placeholder = "https://via.placeholder.com/150/CCCCCC/808080?text=Нет+фото";
+
+            if (string.IsNullOrWhiteSpace(url))
+                return placeholder;
+
+            url = WebUtility.HtmlDecode(url).Trim().Trim('"', '\'');
+
+            // //example.com/img.jpg
+            if (url.StartsWith("//"))
+                url = "https:" + url;
+
+            // absolute
+            if (Uri.TryCreate(url, UriKind.Absolute, out var abs))
+                return abs.ToString();
+
+            // relative to feed
+            if (!string.IsNullOrWhiteSpace(baseUrl) && Uri.TryCreate(baseUrl, UriKind.Absolute, out var feedUri) && Uri.TryCreate(feedUri, url, out var rel1))
+                return rel1.ToString();
+
+            // relative to article
+            if (!string.IsNullOrWhiteSpace(articleUrl) && Uri.TryCreate(articleUrl, UriKind.Absolute, out var artUri) && Uri.TryCreate(artUri, url, out var rel2))
+                return rel2.ToString();
+
+            return placeholder;
+        }
+
+        private string CleanHtml(string html)
         {
             if (string.IsNullOrEmpty(html))
                 return string.Empty;
 
             //Удаление HTML тегов
-            var withoutTags = System.Text.RegularExpressions.Regex.Replace(html, @"<[^>]*>", string.Empty);
+            var withoutTags = Regex.Replace(html, @"<[^>]*>", string.Empty);
 
             //Замена HTML-сущности
-            var decoded = System.Net.WebUtility.HtmlDecode(withoutTags);
+            var decoded = WebUtility.HtmlDecode(withoutTags);
 
             //Удаление лишних пробелов
-            return System.Text.RegularExpressions.Regex.Replace(decoded, @"\s+", " ").Trim();
+            return Regex.Replace(decoded, @"\s+", " ").Trim();
         }
         public List<RssFeed> GetAvailableFeeds() => _availableFeeds;
     }

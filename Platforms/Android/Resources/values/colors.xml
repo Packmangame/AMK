@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@android:color/darker_gray</color>
-    <color name="colorPrimaryDark">@android:color/holo_green_dark</color>
-    <color name="colorAccent">@android:color/holo_red_dark</color>
+	<color name="brand_primary">#2767E9</color>
+	<color name="brand_primary_light">#9AADF6</color>
+	<color name="brand_accent">#FE6A3F</color>
+	<color name="app_background">#F5F5F8</color>
+	<color name="text_primary">#0D0106</color>
+	<color name="midnight_blue">#2767E9</color>
+	<color name="white">#FFFFFF</color>
+	<color name="black">#000000</color>
+	<color name="danger">#D7263D</color>
+	<color name="success">#1FAD66</color>
+	<color name="gray_100">#F1F2F4</color>
+	<color name="gray_200">#E5E7EB</color>
+	<color name="gray_300">#D1D5DB</color>
+	<color name="gray_400">#9CA3AF</color>
+	<color name="gray_500">#6B7280</color>
+	<color name="gray_600">#4B5563</color>
+	<color name="gray_700">#374151</color>
+	<color name="gray_900">#111827</color>
+	<color name="gray_950">#0B1220</color>
+	<color name="off_black">#0D0106</color>
+	<color name="magenta">#FE6A3F</color>
+	<color name="primary">#2767E9</color>
+	<color name="primary_dark">#9AADF6</color>
+	<color name="primary_dark_text">#0D0106</color>
+	<color name="secondary">#9AADF6</color>
+	<color name="secondary_dark_text">#0D0106</color>
+	<color name="tertiary">#FE6A3F</color>
 </resources>

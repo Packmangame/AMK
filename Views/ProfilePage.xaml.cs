@@ -1,30 +1,21 @@
-using AMK.Models.Users;
-using AMK.Services;
-using Microsoft.Maui.Controls;
-using static System.Net.Mime.MediaTypeNames;
+using AMK.Models.ViewModels;
 
 namespace AMK.Views;
 
 public partial class ProfilePage : ContentPage
 {
-    User _user;
-	public ProfilePage()
-	{
-		InitializeComponent();
-        _user = SessionService.Instance.CurrentUser;
-        if (_user.Role == 1)
-        {
-            
-        }
-	}
+    private readonly ProfileViewModel _viewModel;
 
-    private void EditProfile(object sender, EventArgs e)
+    public ProfilePage(ProfileViewModel viewModel)
     {
-
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
     }
 
-    private async void EditBd(object sender, EventArgs e)
+    protected override void OnAppearing()
     {
-        await Shell.Current.GoToAsync($"//{nameof(EditDatabase)}");
+        base.OnAppearing();
+        _viewModel.RefreshCommand.Execute(null);
     }
 }
