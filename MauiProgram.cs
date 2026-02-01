@@ -29,10 +29,11 @@ namespace AMK
 
             builder.Services.AddTransient<NewsViewModel>();
 
-            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
+            // MySQL (Timeweb Cloud)
+            builder.Services.AddSingleton<IDatabaseService, MySqlDatabaseService>();
             builder.Services.AddSingleton<SessionService>(_ => SessionService.Instance);
 
-            builder.Services.AddSingleton<ICompanyNews, CompanyNews>();
+            builder.Services.AddSingleton<ICompanyNews, MySqlCompanyNews>();
             builder.Services.AddTransient<CompanyNewsModel>();
             builder.Services.AddTransient<CompanyNewsListViewModel>();
             builder.Services.AddTransient<EditCompanyNewsViewModel>();

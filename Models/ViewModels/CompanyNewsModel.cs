@@ -59,8 +59,10 @@ namespace AMK.Models.ViewModels
         public ICommand SelectNewsCommand { get; }
 
 
-        public CompanyNewsModel()
+        public CompanyNewsModel(ICompanyNews companyNews, SessionService sessionService)
         {
+            _companyNews = companyNews;
+            _sessionService = sessionService;
             LoadNewsCommand = new AsyncRelayCommand(LoadNewsAsync);
             RefreshNewsCommand = new AsyncRelayCommand(RefreshNewsAsync);
             AddNewsCommand = new RelayCommand(StartAddNews);

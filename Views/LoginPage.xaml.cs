@@ -1,26 +1,18 @@
-using AMK.Models.Users;
 using AMK.Services;
 using AMK.Validation;
 using CommunityToolkit.Maui.Alerts;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Microsoft.IdentityModel.Tokens;
-using SQLite;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Validators = AMK.Validation.Validators;
 
 namespace AMK.Views;
 
 public partial class LoginPage : ContentPage
 {
-    //LocalizationService _localizationService;
-   
-    DatabaseService _databaseService= new DatabaseService();
+    private readonly IDatabaseService _databaseService;
     
-    public LoginPage()
+    public LoginPage(IDatabaseService databaseService)
 	{
 		InitializeComponent();
+		_databaseService = databaseService;
         //_localizationService = LocalizationService.Instance;
     }
    

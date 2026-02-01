@@ -11,7 +11,6 @@ namespace AMK
         public App(IServiceProvider services)
         {
             InitializeComponent();
-            SQLitePCL.Batteries_V2.Init();
             _services = services;
             var localizationService = LocalizationService.Instance;
            
